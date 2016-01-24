@@ -39,7 +39,6 @@ Nightmare.action('download',
             if (options.ignoreDownloads) {
               parent.emit('log', 'ignoring all downloads');
               parent.emit('download', 'cancelled', downloadInfo);
-              parent.emit('log', 'emitted download... anyone listening?');
               downloadItem.cancel();
               return;
             }
