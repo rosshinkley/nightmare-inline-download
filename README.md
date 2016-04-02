@@ -4,9 +4,6 @@ nightmare-inline-download
 Add inline download management to your [Nightmare](http://github.com/segmentio/nightmare) scripts.
 
 # Important Note
-This library will not be ready for use until [Nightmare #391](https://github.com/segmentio/nightmare/issues/391) is completed.  For now, if this library is needed, use the [`electron-plugin` branch from my fork](https://github.com/rosshinkley/nightmare/tree/electron-plugin).
-
-# Another Important Note
 If you need to manage multiple downloads at the same time or want downloads to be processed in the background, check out the [Nightmare download manager](https://github.com/rosshinkley/nightmare-download-manager).
 
 ## Usage
