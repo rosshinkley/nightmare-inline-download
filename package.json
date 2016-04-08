@@ -1,8 +1,9 @@
 {
   "name": "nightmare-inline-download",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "main": "./nightmare-inline-download.js",
+  "description":"Add inline download management to NightmareJS",
   "scripts": {
     "test": "mocha test"
   },
