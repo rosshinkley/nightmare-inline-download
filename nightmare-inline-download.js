@@ -9,7 +9,7 @@ module.exports = exports = function(Nightmare) {
         .join,
         sliced = require('sliced');
 
-      var app = require('app');
+      var app = require('electron').app;
 
       var _parentRequestedDownload = false,
         _maxParentRequestWait = options.maxDownloadRequestWait || 5000;
