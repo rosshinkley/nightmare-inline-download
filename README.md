@@ -55,3 +55,4 @@ var downloadInfo = nightmare
   .end()
   .then(()=>console.log('done'));
 ```
+
