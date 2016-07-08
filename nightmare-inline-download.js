@@ -46,6 +46,7 @@ module.exports = exports = function(Nightmare) {
                 if (state == 'completed') {
                   fs.renameSync(join(app.getPath('downloads'), downloadItem.getFilename()), downloadInfo.path);
                 }
+                _parentRequestedDownload = false;
                 parent.emit('download', state, downloadInfo);
               });
 
@@ -69,7 +70,6 @@ module.exports = exports = function(Nightmare) {
                   item = arguments[1];
                 }
 
-                parent.removeListener('download', handler);
                 if (item.filename == downloadItem.getFilename()) {
                   if (path == 'cancel') {
                     downloadItem.cancel();
@@ -84,7 +84,7 @@ module.exports = exports = function(Nightmare) {
                 }
               };
 
-              parent.on('download', handler);
+              parent.once('download', handler);
               parent.emit('log', 'will-download about bubble to parent');
               parent.emit('download', 'started', downloadInfo);
             } else if (elapsed >= _maxParentRequestWait) {
@@ -110,7 +110,8 @@ module.exports = exports = function(Nightmare) {
       } else {
         done = arguments[0];
       }
-      self.child.on('download', function(state, downloadInfo) {
+      
+      var handler = function(state, downloadInfo) {
         downloadInfo.state = state;
         debug('download', downloadInfo);
         if (state == 'started') {
@@ -121,12 +122,15 @@ module.exports = exports = function(Nightmare) {
           }
         } else {
           if (state == 'interrupted' || state == 'force-cancelled') {
+            self.child.removeListener('download', handler);
             done(state, downloadInfo);
           } else if (state == 'completed' || state == 'cancelled') {
+            self.child.removeListener('download', handler);
             done(null, downloadInfo);
           }
         }
-      });
+      };
+      self.child.on('download', handler);
 
       self.child.emit('expect-download');
       return this;

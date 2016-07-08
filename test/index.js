@@ -138,6 +138,57 @@ describe('Nightmare download manager', function() {
       statFail.should.be.false;
     });
 
+    it('should allow for multiple downloads', function(done) {
+      var downloadItem, statFail = false,
+        finalState;
+
+      nightmare = Nightmare({
+        paths:{
+          downloads: tmp_dir
+        }
+      });
+
+      nightmare
+      .goto('http://localhost:7500/downloads')
+      .evaluate(function(){
+        return ['dl1', 'dl2', 'dl3'];
+      })
+      .then((linknames) => {
+        return linknames.reduce((acc, name, ix) => {
+          return acc.then(function(results){
+            return nightmare
+              .click('#'+name)
+              .download(path.resolve(tmp_dir, 'subdir', `thing_${ix}.txt`))
+              .then(info => {
+                results.push(info);
+                return results;
+              });
+          });
+        }, Promise.resolve([]))
+        .then(function(results){
+          var stats = [];
+          try {
+            stats.push(fs.statSync(path.join(tmp_dir, 'subdir', 'thing_0.txt')));
+            stats.push(fs.statSync(path.join(tmp_dir, 'subdir', 'thing_1.txt')));
+            stats.push(fs.statSync(path.join(tmp_dir, 'subdir', 'thing_2.txt')));
+          } catch (e) {
+            statFail = true;
+          }
+
+          statFail.should.be.false;
+          if(!statFail){
+            results[0].totalBytes.should.equal(stats[0].size);
+            /thing\_0\.txt$/.test(results[0].path).should.be.true;
+            results[1].totalBytes.should.equal(stats[1].size);
+            /thing\_1\.txt$/.test(results[1].path).should.be.true;
+            results[2].totalBytes.should.equal(stats[2].size);
+            /thing\_2\.txt$/.test(results[2].path).should.be.true;
+          }
+          done();
+        })
+      });
+    });
+
     it('should cancel a specific download', function * () {
       var downloadItem, finalState;
 
